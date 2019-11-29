@@ -267,7 +267,17 @@ window.addEventListener('load', () => {
         }
         console.log(array)
     }
+    /*--------------ODD EVEN SORT----------*/
+    function oddEvenSort(array){
 
+        for(let a = 0; a < array.length; a++){
+                if(a%2 === 0){
+                    console.log(a)
+                }
+                else (console.log("odd"))
+        }
+    }
+ 
     /*--------------SELECTION SORT----------*/
     function selectionSort(array){
         let MIN;
@@ -331,11 +341,5 @@ window.addEventListener('load', () => {
         return newArray
 
     }
-   
-   
     /*--------SORTING CALLS-----------------*/
-    /*-------CALLING BUBBLE SORT-----------*/
- 
-
- 
 })

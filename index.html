@@ -9,8 +9,29 @@
     <script src = "./index.js"></script>
 </head>
 <body>
-    <header>
-        
+    <header id = "header">
+        <ul>
+            <li id = "options">
+                <p>options</p>
+                <!-- <input type="range"> <input type = "text">
+                <input type="range"> <input type = "text"> -->
+            </li>
+            <li>
+                <button id = "play">Play</button>
+            </li>
+            <li>
+                <button id = "pause">Pause</button>   
+            </li>
+            <li>
+                <p>Sorting Algorithm</p>
+                <select name="algorithm" id="algorithm"> 
+                    <option value="drawBubbleSort">Bubble sort</option>
+                    <option value="drawCombSort">Comb sort</option>
+                    <option value="drawSelectionSort">Selection sort</option>
+                    <option value="drawInsertionSort">Insertion sort</option>
+                </select>
+            </li>
+        </ul>
     </header>
     <canvas id = "canvas"></canvas>
 </body>
