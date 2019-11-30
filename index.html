@@ -6,30 +6,29 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sorting Algorithm</title>
     <link rel="stylesheet" href="./index.css">
+    <script src="https://kit.fontawesome.com/2ba695a310.js" crossorigin="anonymous"></script>
     <script src = "./index.js"></script>
 </head>
 <body>
     <header id = "header">
         <ul>
-            <li id = "options">
-                <p>options</p>
-                <!-- <input type="range"> <input type = "text">
-                <input type="range"> <input type = "text"> -->
-            </li>
-            <li>
-                <button id = "play">Play</button>
-            </li>
-            <li>
-                <button id = "pause">Pause</button>   
-            </li>
-            <li>
-                <p>Sorting Algorithm</p>
+            <li class = "listSelect">
                 <select name="algorithm" id="algorithm"> 
+                    <option value="select">--Select Algorithm--</option>
                     <option value="drawBubbleSort">Bubble sort</option>
                     <option value="drawCombSort">Comb sort</option>
                     <option value="drawSelectionSort">Selection sort</option>
                     <option value="drawInsertionSort">Insertion sort</option>
                 </select>
+            </li>
+            <li>
+                <button id = "play"><i class="fas fa-play icon" id = "playIcon"></i><span>Play</span></button>
+            </li>
+            <li>
+                <button id = "pause"><i class="fas fa-pause icon" id = "pauseIcon"></i><span>Pause</span></button>   
+            </li>
+            <li>
+               <button>Options</button>
             </li>
         </ul>
     </header>

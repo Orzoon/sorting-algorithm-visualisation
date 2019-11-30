@@ -1,5 +1,10 @@
 window.addEventListener('load', () => {
     let canvas = document.getElementById('canvas');
+    let playButton = document.getElementById('play');
+    let playIcon = document.getElementById('playIcon');
+    let pauseIcon =document.getElementById('pauseIcon');
+    let pauseButton = document.getElementById('pause');
+    let select = document.getElementById('algorithm');
     let c = undefined;
     if(canvas.getContext('2d')){
         c = canvas.getContext('2d');
@@ -9,15 +14,23 @@ window.addEventListener('load', () => {
     }
     canvas.height = document.documentElement.clientHeight;
     canvas.width = document.documentElement.clientWidth;
-    let testArray = []
-    let arrayListToSort = [];
-    let totXLength = 0;
-    let lineSize = 1;
+    //setUp Variables
+    let paused = false;
+    let arrayLength = 200;
     let lineXGap = 2;
-    let arrayLength = 300;
-    let animating = true;
+    let lineSize = 1;
+    let currentAlgorithm = null;
     let i = 0;
     let j = 0;
+    let arrayListToSort = [];
+    let totXLength = 0;
+    let animating = true;
+    let timerId;
+    //Event Listeners
+    playButton.addEventListener('click', runAlgorithm);
+    pauseButton.addEventListener('click', pauseAlgorithm);
+    select.addEventListener('change', changeColor);
+    //// ALGORITHMS VARIABLES
     let combSortGap = 0;
     let combSortGapInitial = true;
     let selectionSortMIN = 0;
@@ -26,7 +39,99 @@ window.addEventListener('load', () => {
         arrayListToSort[s] = Math.floor(Math.random()* (canvas.height-100))
         totXLength = totXLength + lineXGap;
     }
-    testArray = [...arrayListToSort]
+    function runAlgorithm(btnIndicator){
+        paused = false;
+        animating = true;
+        let algorithmToRun = document.getElementById("algorithm").value.trim();
+        if(currentAlgorithm === null){
+            currentAlgorithm = algorithmToRun;
+        }
+        else if(currentAlgorithm !== algorithmToRun){
+            currentAlgorithm = algorithmToRun;
+            cancelAnimationFrame(timerId)
+            initialSetup();
+        }
+        else if(currentAlgorithm === algorithmToRun){
+            if(btnIndicator !== 'pausedBtn'){
+                cancelAnimationFrame(timerId)
+                initialSetup();
+            }
+        }
+        //Styles
+        playButton.style.color = "#300a44";
+        playIcon.style.color = "#300a44";
+        pauseButton.style.color = "#300a44";
+        pauseIcon.style.color = "#300a44";
+        switch(algorithmToRun){
+            case 'drawBubbleSort': drawBubbleSort(arrayListToSort) 
+            break;
+            case 'drawCombSort': drawCombSort(arrayListToSort);
+            break;
+            case 'drawSelectionSort': drawSelectionSort(arrayListToSort);
+            break;
+            case 'drawInsertionSort': drawInsertionSort(arrayListToSort);
+            break;
+        }
+        // if(algorithmToRun == 'drawBubbleSort'){
+        //     drawBubbleSort(arrayListToSort);
+        // } 
+    }
+    function initialSetup(){
+         paused = false;
+         arrayLength = 200;
+         lineXGap = 2;
+         lineSize = 1;
+         i = 0;
+         j = 0;
+         c.clearRect(0,0,canvas.width, canvas.height)
+         pauseButton.style.color = "#300a44";
+         pauseIcon.style.color = "#300a44";
+         pauseButton.childNodes[1].innerText = 'Pause';
+    }
+    function pauseAlgorithm(){
+        let selection = select.value.trim();
+        if(selection == "select" ){
+            return
+        }
+        if(paused === false){
+            animating = false;
+            paused = true;
+            pauseButton.childNodes[1].innerText = 'Resume';
+            pauseButton.style.color = "#007d60";
+            pauseIcon.style.color = "#007d60";
+            playButton.style.color = "#300a44";
+            playIcon.style.color = "#300a44";
+            //playButton.disabled = true;
+        }
+        else {
+            animating = true;
+            paused = false
+            pauseButton.childNodes[1].innerText = 'Pause';
+            pauseButton.style.color = "#300a44";
+            pauseIcon.style.color = "#300a44";
+            //playButton.disabled = false;
+            runAlgorithm("pausedBtn");
+        }
+    }
+
+    function finishExecution(){
+        if(paused === false && animating === false){
+           finalDraw();
+        }
+        else if(paused === true) {
+            animating = false
+        }
+    }
+    function changeColor(){
+      let selection = select.value.trim();
+      if(selection !== "select"){
+        playButton.style.color = "#007d60";
+        playIcon.style.color = "#007d60";
+        pauseButton.childNodes[1].innerText = 'Pause'
+        pauseButton.style.color = "#300a44";
+        pauseIcon.style.color = "#300a44";
+      }
+    }
     function finalDraw(){
         c.clearRect(0,0,canvas.width, canvas.height)
         for(z = 0; z < arrayListToSort.length; z ++){
@@ -43,7 +148,8 @@ window.addEventListener('load', () => {
     /*-----------DRAWBUBBLESORT------------*/
     function drawBubbleSort(){
         if(animating){
-            window.requestAnimationFrame(drawBubbleSort)
+            console.log('running')
+            timerId =  window.requestAnimationFrame(drawBubbleSort)
             c.clearRect(0,0, canvas.width, canvas.height)
             if( j >arrayListToSort.length-i-1){
                 j = 0;
@@ -81,13 +187,12 @@ window.addEventListener('load', () => {
             }
         }
         else {
-            finalDraw()
+            finishExecution()
         }
     }
-
     function drawCombSort(){
         if(animating){
-            requestAnimationFrame(drawCombSort);
+            timerId = requestAnimationFrame(drawCombSort);
             c.clearRect(0,0,canvas.width, canvas.height)
             if(combSortGapInitial){
                 combSortGap = arrayListToSort.length;
@@ -131,13 +236,12 @@ window.addEventListener('load', () => {
             }
         }
         else {
-            console.log("finished")
-            finalDraw();
+            finishExecution()
         }
     }
     function drawSelectionSort(){
         if(animating){
-            requestAnimationFrame(drawSelectionSort);
+            timerId = requestAnimationFrame(drawSelectionSort);
             // clearing canvas
             c.clearRect(0,0,canvas.width, canvas.height);
             // drawing list on canvas
@@ -180,13 +284,12 @@ window.addEventListener('load', () => {
             }
         }
         else{
-            console.log("finished")
-            finalDraw();
+            finishExecution()
         }
     }
     function drawInsertionSort(){
         if(animating){
-            requestAnimationFrame(drawInsertionSort);
+            timerId = requestAnimationFrame(drawInsertionSort);
             c.clearRect(0,0,canvas.width, canvas.height);
             if(i > arrayListToSort.length-1){
                 animating = false;
@@ -230,8 +333,7 @@ window.addEventListener('load', () => {
           
         }
         else {
-            console.log("finished");
-            finalDraw();
+            finishExecution()
         }
     }
     //requestAnimationFrame(drawBubbleSort)
@@ -269,15 +371,8 @@ window.addEventListener('load', () => {
     }
     /*--------------ODD EVEN SORT----------*/
     function oddEvenSort(array){
-
-        for(let a = 0; a < array.length; a++){
-                if(a%2 === 0){
-                    console.log(a)
-                }
-                else (console.log("odd"))
-        }
+     //to do
     }
- 
     /*--------------SELECTION SORT----------*/
     function selectionSort(array){
         let MIN;
@@ -293,7 +388,6 @@ window.addEventListener('load', () => {
             array[MIN] = temp;
         }
     }
-
     /*--------------INSERTION SORT------------*/
     function insertionSort(array){
         let MIN;
