@@ -3,7 +3,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    overflow: hidden;
 }
 .hint{
     font-family: 'Roboto', sans-serif;
@@ -11,11 +10,12 @@
     font-size: 15px;
 }
 #header {
+    position: relative;
     background: #fff;
     padding:10px 5px 10px 5px;
     border-bottom:1px solid #eee;
 }
-ul {
+ul.topMenu {
     position: relative;
     width: 100%;
     list-style-type: none;
@@ -23,7 +23,6 @@ ul {
     justify-content: center;
     grid-template-columns: 170px repeat(auto-fill, minmax(95px,90px));
     grid-template-rows: auto;
-    /* grid-template-columns: auto  repeat(auto-fill, minmax(90px,90px)); */
     font-family: 'Roboto', sans-serif;
     font-size: 15px;
     color: #300a44;
@@ -41,7 +40,7 @@ button {
 button:hover {
     cursor: pointer;
 }
-ul li {
+ul.topMenu li {
     padding: 3px;
     height: 45px;  
     font-size: 15px;
@@ -65,9 +64,55 @@ ul li button i {
     font-size: 17px;
     color: #300a44;
 }
-
 .colorGreen{
     color: green;
 }
+.canvasControlsContainer{
+    position: relative
+}
+.controlsContainer{
+    display: grid;
+    position: absolute;
+    top: 0;
+    left: 0px;
+    /* left: -200px; */
+    width: auto;
+    height: 190px;
+    background: #fff;
+    z-index: 2;
+    justify-items: center;
+    align-items: start;
+    justify-content: center;
+}
+
+.controlsContainer li {
+    margin: 10px 15px 0px 15px;
+    list-style-type: none;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #000;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    height: 30px;
+    background: inherit;
+    padding: 0;
+}
+
+.controlsContainer li div input{
+   width: 80px;
+   padding: 0;
+    
+}
+.controlsContainer li div{
+    background: inherit;
+}
+.controlsContainer li input {
+   width: 50px;
+   height: 30px;
+   align-self: center;
+   padding-left: 5px;
+}
+
 
 

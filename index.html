@@ -11,7 +11,7 @@
 </head>
 <body>
     <header id = "header">
-        <ul>
+        <ul class = "topMenu"> 
             <li class = "listSelect">
                 <select name="algorithm" id="algorithm"> 
                     <option value="select">--Select Algorithm--</option>
@@ -28,10 +28,32 @@
                 <button id = "pause"><i class="fas fa-pause icon" id = "pauseIcon"></i><span>Pause</span></button>   
             </li>
             <li>
-               <button>Options</button>
+               <button id = "controlsBtn">Controls</button>
             </li>
         </ul>
     </header>
-    <canvas id = "canvas"></canvas>
+    <section class = "canvasControlsContainer">
+            <ul id ="controlsContainer" class = "controlsContainer">  
+                <li>
+                    <div>
+                        <p>Array Length</p><input type="range" id = "arrayLengthRange" class = "range">
+                    </div>
+                     <input type="number"  class = "input" id = "arrayLength">
+                </li>
+                <li>
+                    <div>
+                        <p>Line width </p><input type="range" id = "lineWidthRange" class = "range">
+                    </div>
+                    <input type="number"  class = "input" id = "arrayWidth">
+                </li>
+                <li>
+                    <div>
+                        <p>Line gap </p><input type="range" id = "lineGapRange" class = "range"> 
+                    </div>
+                    <input type="number"  class = "input" id = "arrayGap">
+                </li>
+            </ul>
+            <canvas id = "canvas"></canvas>
+    </section>
 </body>
 </html>

@@ -5,6 +5,11 @@ window.addEventListener('load', () => {
     let pauseIcon =document.getElementById('pauseIcon');
     let pauseButton = document.getElementById('pause');
     let select = document.getElementById('algorithm');
+    let controlsBtn = document.getElementById('controlsBtn');
+    let controlsContainer  = document.getElementById('controlsContainer');
+    // contols Elements
+    let range = document.querySelectorAll("range");
+    let input = document.querySelectorAll("input");
     let c = undefined;
     if(canvas.getContext('2d')){
         c = canvas.getContext('2d');
@@ -15,6 +20,7 @@ window.addEventListener('load', () => {
     canvas.height = document.documentElement.clientHeight;
     canvas.width = document.documentElement.clientWidth;
     //setUp Variables
+    let controlsVisible = false;
     let paused = false;
     let arrayLength = 200;
     let lineXGap = 2;
@@ -30,15 +36,29 @@ window.addEventListener('load', () => {
     playButton.addEventListener('click', runAlgorithm);
     pauseButton.addEventListener('click', pauseAlgorithm);
     select.addEventListener('change', changeColor);
+    controlsBtn.addEventListener('click', showControls);
     //// ALGORITHMS VARIABLES
     let combSortGap = 0;
     let combSortGapInitial = true;
     let selectionSortMIN = 0;
     let setInsertionLoop = true;
-    for(s = 0; s < arrayLength; s++){
-        arrayListToSort[s] = Math.floor(Math.random()* (canvas.height-100))
-        totXLength = totXLength + lineXGap;
+    function initialDraw(){
+        for(s = 0; s < arrayLength; s++){
+            arrayListToSort[s] = Math.floor(Math.random()* (canvas.height-100))
+            totXLength = totXLength + lineXGap;
+        }
+
+        // drawing Initially
+        c.clearRect(0,0,canvas.width, canvas.height)
+        for(z = 0; z < arrayListToSort.length; z ++){
+            c.beginPath();
+            c.moveTo(canvas.width/2 - totXLength/2 + (z * lineXGap), 0);
+            c.lineTo(canvas.width/2 - totXLength/2 + (z * lineXGap),arrayListToSort[z]);
+            c.lineWidth = lineSize;
+            c.stroke();
+        }
     }
+    initialDraw();
     function runAlgorithm(btnIndicator){
         paused = false;
         animating = true;
@@ -131,6 +151,13 @@ window.addEventListener('load', () => {
         pauseButton.style.color = "#300a44";
         pauseIcon.style.color = "#300a44";
       }
+    }
+
+    function showControls(){
+       controlsVisible = !controlsVisible;
+       (controlsVisible) ? 
+       (controlsContainer.style.left = "0%"): 
+       (controlsContainer.style.left = "-100%");  
     }
     function finalDraw(){
         c.clearRect(0,0,canvas.width, canvas.height)
