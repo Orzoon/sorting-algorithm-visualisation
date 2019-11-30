@@ -53,7 +53,6 @@ ul li select{
     font-weight: 400;
     border: 1px solid #300a44;
 }
-
 ul li button span{
     display: inline-block;
     margin-left: 5px;
@@ -84,7 +83,6 @@ ul li button i {
     align-items: start;
     justify-content: center;
 }
-
 .controlsContainer li {
     margin: 10px 15px 0px 15px;
     list-style-type: none;
@@ -98,17 +96,18 @@ ul li button i {
     background: inherit;
     padding: 0;
 }
-
 .controlsContainer li div input{
    width: 80px;
    padding: 0;
-    
+}
+.controlsContainer li div input:hover {
+    cursor: pointer;
 }
 .controlsContainer li div{
     background: inherit;
 }
 .controlsContainer li input {
-   width: 50px;
+   width: 55px;
    height: 30px;
    align-self: center;
    padding-left: 5px;

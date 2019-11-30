@@ -7,9 +7,10 @@ window.addEventListener('load', () => {
     let select = document.getElementById('algorithm');
     let controlsBtn = document.getElementById('controlsBtn');
     let controlsContainer  = document.getElementById('controlsContainer');
-    // contols Elements
-    let range = document.querySelectorAll("range");
-    let input = document.querySelectorAll("input");
+    // controls Elements
+    let range = document.querySelectorAll(".range");
+    let input = document.querySelectorAll(".input");
+
     let c = undefined;
     if(canvas.getContext('2d')){
         c = canvas.getContext('2d');
@@ -22,9 +23,9 @@ window.addEventListener('load', () => {
     //setUp Variables
     let controlsVisible = false;
     let paused = false;
-    let arrayLength = 200;
-    let lineXGap = 2;
-    let lineSize = 1;
+    let arrayLength = null;
+    let lineSize = null;
+    let lineXGap = null;
     let currentAlgorithm = null;
     let i = 0;
     let j = 0;
@@ -37,17 +38,20 @@ window.addEventListener('load', () => {
     pauseButton.addEventListener('click', pauseAlgorithm);
     select.addEventListener('change', changeColor);
     controlsBtn.addEventListener('click', showControls);
+    for(let a = 0; a < range.length; a++){
+        range[a].addEventListener("change", setInputValueFromRange.bind(this,a));
+        input[a].addEventListener("change", setRangeValueFromInput.bind(this,a));
+    }
     //// ALGORITHMS VARIABLES
     let combSortGap = 0;
     let combSortGapInitial = true;
     let selectionSortMIN = 0;
     let setInsertionLoop = true;
     function initialDraw(){
-        for(s = 0; s < arrayLength; s++){
+        for(let s = 0; s < arrayLength; s++){
             arrayListToSort[s] = Math.floor(Math.random()* (canvas.height-100))
             totXLength = totXLength + lineXGap;
         }
-
         // drawing Initially
         c.clearRect(0,0,canvas.width, canvas.height)
         for(z = 0; z < arrayListToSort.length; z ++){
@@ -55,10 +59,10 @@ window.addEventListener('load', () => {
             c.moveTo(canvas.width/2 - totXLength/2 + (z * lineXGap), 0);
             c.lineTo(canvas.width/2 - totXLength/2 + (z * lineXGap),arrayListToSort[z]);
             c.lineWidth = lineSize;
+            c.strokeStyle = 'red';
             c.stroke();
         }
     }
-    initialDraw();
     function runAlgorithm(btnIndicator){
         paused = false;
         animating = true;
@@ -98,16 +102,22 @@ window.addEventListener('load', () => {
     }
     function initialSetup(){
          paused = false;
-         arrayLength = 200;
-         lineXGap = 2;
-         lineSize = 1;
+         arrayLength = parseInt(input[0].value);
+         lineSize = parseInt(input[1].value);
+         lineXGap = parseInt(input[2].value);
          i = 0;
          j = 0;
-         c.clearRect(0,0,canvas.width, canvas.height)
+         //c.clearRect(0,0,canvas.width, canvas.height)
          pauseButton.style.color = "#300a44";
          pauseIcon.style.color = "#300a44";
          pauseButton.childNodes[1].innerText = 'Pause';
     }
+    setRange()
+    setInputValueFromRange(0)
+    setInputValueFromRange(1)
+    setInputValueFromRange(2)
+    initialSetup();
+    initialDraw();
     function pauseAlgorithm(){
         let selection = select.value.trim();
         if(selection == "select" ){
@@ -133,7 +143,6 @@ window.addEventListener('load', () => {
             runAlgorithm("pausedBtn");
         }
     }
-
     function finishExecution(){
         if(paused === false && animating === false){
            finalDraw();
@@ -152,12 +161,54 @@ window.addEventListener('load', () => {
         pauseIcon.style.color = "#300a44";
       }
     }
-
     function showControls(){
        controlsVisible = !controlsVisible;
        (controlsVisible) ? 
        (controlsContainer.style.left = "0%"): 
        (controlsContainer.style.left = "-100%");  
+    }
+    function setRange(){
+        let totWidth = canvas.width;
+        range[1].max = 10;
+        range[2].max = 20;
+        range[0].max = totWidth;
+        input[0].max = range[0].max;
+        input[1].max = range[1].max;
+        input[2].max = range[2].max;
+        for(let a = 0; a < range.length; a++){
+            range[a].min = 0;
+            input[a].min = 0;
+        }
+        range[0].value = 100;
+        range[1].value = 4;
+        range[2].value = 5;
+    }
+    setRange()
+    function setInputValueFromRange(index){
+      switch(index){
+        case 0: 
+            input[0].value = range[0].value
+            break;
+        case 1: 
+            input[1].value = range[1].value
+            break;
+        case 2: 
+            input[2].value = range[2].value
+            break;
+      }
+    }
+    function setRangeValueFromInput(index){
+        switch(index){
+            case 0: 
+                range[0].value = range[0].value
+                break;
+            case 1: 
+                range[1].value = range[1].value
+                break;
+            case 2: 
+                range[2].value = range[2].value
+                break;
+          }
     }
     function finalDraw(){
         c.clearRect(0,0,canvas.width, canvas.height)
@@ -462,5 +513,4 @@ window.addEventListener('load', () => {
         return newArray
 
     }
-    /*--------SORTING CALLS-----------------*/
 })
