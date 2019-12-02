@@ -10,6 +10,10 @@ window.addEventListener('load', () => {
     // controls Elements
     let range = document.querySelectorAll(".range");
     let input = document.querySelectorAll(".input");
+    let screenSizeValue = document.querySelector(".screenSizeValue");
+    let totalCalcValue = document.querySelector(".totalCalcValue");
+    let totalWithinRange = true;
+    let controlStrong = document.querySelector(".controlStrong");
 
     let c = undefined;
     if(canvas.getContext('2d')){
@@ -18,8 +22,6 @@ window.addEventListener('load', () => {
     else{
         console.log('canvas not supported')
     }
-    canvas.height = document.documentElement.clientHeight;
-    canvas.width = document.documentElement.clientWidth;
     //setUp Variables
     let controlsVisible = false;
     let paused = false;
@@ -32,12 +34,22 @@ window.addEventListener('load', () => {
     let arrayListToSort = [];
     let totXLength = 0;
     let animating = true;
+    let rangeInputChange = false;
     let timerId;
+    //colors
+    let sortedColor = "#6decb9";
+    let unsortedColor = "#ddd";
+    let pointer = "red";
+    let marker = "blue";
+    let finalColor = sortedColor;
+    canvas.height = document.documentElement.clientHeight;
+    canvas.width = null;
     //Event Listeners
     playButton.addEventListener('click', runAlgorithm);
     pauseButton.addEventListener('click', pauseAlgorithm);
     select.addEventListener('change', changeColor);
     controlsBtn.addEventListener('click', showControls);
+    window.addEventListener("resize", init);
     for(let a = 0; a < range.length; a++){
         range[a].addEventListener("change", setInputValueFromRange.bind(this,a));
         input[a].addEventListener("change", setRangeValueFromInput.bind(this,a));
@@ -48,8 +60,10 @@ window.addEventListener('load', () => {
     let selectionSortMIN = 0;
     let setInsertionLoop = true;
     function initialDraw(){
+        totXLength = 0;
+        arrayListToSort = [];
         for(let s = 0; s < arrayLength; s++){
-            arrayListToSort[s] = Math.floor(Math.random()* (canvas.height-100))
+            arrayListToSort[s] = Math.floor(Math.random()* (canvas.height-10))
             totXLength = totXLength + lineXGap;
         }
         // drawing Initially
@@ -59,7 +73,7 @@ window.addEventListener('load', () => {
             c.moveTo(canvas.width/2 - totXLength/2 + (z * lineXGap), 0);
             c.lineTo(canvas.width/2 - totXLength/2 + (z * lineXGap),arrayListToSort[z]);
             c.lineWidth = lineSize;
-            c.strokeStyle = 'red';
+            c.strokeStyle = "#ddd";
             c.stroke();
         }
     }
@@ -72,7 +86,6 @@ window.addEventListener('load', () => {
         }
         else if(currentAlgorithm !== algorithmToRun){
             currentAlgorithm = algorithmToRun;
-            cancelAnimationFrame(timerId)
             initialSetup();
         }
         else if(currentAlgorithm === algorithmToRun){
@@ -101,23 +114,25 @@ window.addEventListener('load', () => {
         // } 
     }
     function initialSetup(){
-         paused = false;
-         arrayLength = parseInt(input[0].value);
-         lineSize = parseInt(input[1].value);
-         lineXGap = parseInt(input[2].value);
-         i = 0;
-         j = 0;
-         //c.clearRect(0,0,canvas.width, canvas.height)
-         pauseButton.style.color = "#300a44";
-         pauseIcon.style.color = "#300a44";
-         pauseButton.childNodes[1].innerText = 'Pause';
+        paused = false;
+        arrayLength = parseInt(input[0].value);
+        lineSize = parseInt(input[1].value);
+        let gap = parseInt(input[2].value);
+        lineXGap = gap + lineSize;
+        i = 0;
+        j = 0;
+        //c.clearRect(0,0,canvas.width, canvas.height)
+        pauseButton.style.color = "#300a44";
+        pauseIcon.style.color = "#300a44";
+        pauseButton.childNodes[1].innerText = 'Pause';
+
+         // algorithms Initials
+         combSortGap = 0;
+         combSortGapInitial = true;
+         selectionSortMIN = 0;
+         setInsertionLoop = true;
+         rangeInputChange = false;
     }
-    setRange()
-    setInputValueFromRange(0)
-    setInputValueFromRange(1)
-    setInputValueFromRange(2)
-    initialSetup();
-    initialDraw();
     function pauseAlgorithm(){
         let selection = select.value.trim();
         if(selection == "select" ){
@@ -127,8 +142,8 @@ window.addEventListener('load', () => {
             animating = false;
             paused = true;
             pauseButton.childNodes[1].innerText = 'Resume';
-            pauseButton.style.color = "#007d60";
-            pauseIcon.style.color = "#007d60";
+            pauseButton.style.color = "#5CB85C";
+            pauseIcon.style.color = "#5CB85C";
             playButton.style.color = "#300a44";
             playIcon.style.color = "#300a44";
             //playButton.disabled = true;
@@ -144,9 +159,18 @@ window.addEventListener('load', () => {
         }
     }
     function finishExecution(){
-        if(paused === false && animating === false){
-           finalDraw();
+        if(rangeInputChange === true){
+            if(timerId){
+                cancelAnimationFrame(timerId)
+            }
+            initialSetup();
+            initialDraw();
+            rangeInputChange = false;
+            animating = true;
         }
+        else if(paused === false && animating === false){
+            finalDraw();
+            }
         else if(paused === true) {
             animating = false
         }
@@ -159,31 +183,66 @@ window.addEventListener('load', () => {
         pauseButton.childNodes[1].innerText = 'Pause'
         pauseButton.style.color = "#300a44";
         pauseIcon.style.color = "#300a44";
+        cancelAnimationFrame(timerId);
+        initialSetup();
+        initialDraw();
       }
     }
     function showControls(){
        controlsVisible = !controlsVisible;
-       (controlsVisible) ? 
-       (controlsContainer.style.left = "0%"): 
-       (controlsContainer.style.left = "-100%");  
+        if(controlsVisible){
+            controlsContainer.style.left = "0%";
+            controlsBtn.style.color = "#5CB85C";
+            setTimeout(() => {
+                window.addEventListener('click', externalControlClick, false);
+            }, 200);
+       
+        }
+        else {
+            controlsContainer.style.left = "-100%";
+            controlsBtn.style.color = "#300a44";
+            setTimeout(() => {
+                window.removeEventListener('click', externalControlClick);
+          }, 200);
+        }
+    }
+    function externalControlClick(e){
+      if(!controlsContainer.contains(e.target) ||  controlsVisible === false){
+            controlsVisible = false;
+            window.removeEventListener('click', externalControlClick)
+            controlsContainer.style.left = "-100%";
+            controlsBtn.style.color = "#300a44";
+      }
     }
     function setRange(){
         let totWidth = canvas.width;
+        range[0].max = totWidth;
         range[1].max = 10;
         range[2].max = 20;
-        range[0].max = totWidth;
         input[0].max = range[0].max;
         input[1].max = range[1].max;
         input[2].max = range[2].max;
         for(let a = 0; a < range.length; a++){
-            range[a].min = 0;
-            input[a].min = 0;
+            if(a === 0){
+                range[a].min = 10;
+                input[a].min = 10;
+            }
+            else if(a === 1){
+                range[a].min = 1;
+                input[a].min = 1;
+            }
+            else if(a === 2){
+                range[a].min = 1;
+                input[a].min = 1;
+            }
         }
-        range[0].value = 100;
-        range[1].value = 4;
-        range[2].value = 5;
+        range[0].value = 50;
+        range[1].value = 3;
+        range[2].value = 4;
+
+        // setting canvas Size
+        screenSizeValue.innerText = totWidth;
     }
-    setRange()
     function setInputValueFromRange(index){
       switch(index){
         case 0: 
@@ -196,6 +255,10 @@ window.addEventListener('load', () => {
             input[2].value = range[2].value
             break;
       }
+      setTotal()
+      animating = false;
+      rangeInputChange = true;
+      finishExecution();
     }
     function setRangeValueFromInput(index){
         switch(index){
@@ -209,6 +272,32 @@ window.addEventListener('load', () => {
                 range[2].value = range[2].value
                 break;
           }
+          // setting total
+          setTotal()
+          // setting on change everyTime
+          rangeInputChange = true;
+          animating = false;
+          finishExecution();
+          
+    }
+    function setTotal(){
+        totXLength = 0;
+        arrayLength = parseInt(input[0].value);
+        lineSize = parseInt(input[1].value);
+        let gap = parseInt(input[2].value);
+        lineXGap = gap + lineSize;
+        for(let a = 0; a < arrayLength; a++){
+            totXLength = totXLength + lineXGap;
+        }
+        totalCalcValue.innerText = totXLength;
+        if(totXLength > parseInt(screenSizeValue.innerText)){
+            totalCalcValue.style.color = "#e4000f";
+            controlStrong.style.color = "#e4000f";
+        }
+        else {
+            totalCalcValue.style.color = "#00AA66";
+            controlStrong.style.color = "#00AA66";
+        }
     }
     function finalDraw(){
         c.clearRect(0,0,canvas.width, canvas.height)
@@ -217,7 +306,7 @@ window.addEventListener('load', () => {
             c.moveTo(canvas.width/2 - totXLength/2 + (z * lineXGap), 0);
             c.lineTo(canvas.width/2 - totXLength/2 + (z * lineXGap),arrayListToSort[z]);
             c.lineWidth = lineSize;
-            c.strokeStyle = 'green'
+            c.strokeStyle = finalColor;
             c.stroke();
         }
     }
@@ -239,16 +328,16 @@ window.addEventListener('load', () => {
                 c.lineTo(canvas.width/2 - totXLength/2 + (x * lineXGap),arrayListToSort[x]);
                 c.lineWidth = lineSize;
                 if(x === j){
-                    c.strokeStyle = 'red'
+                    c.strokeStyle = pointer;
                 }
                 else if(x === j-1){
-                    c.strokeStyle = 'blue'
+                    c.strokeStyle = marker;
                 }
                 else if(x > arrayListToSort.length-i-1){
-                    c.strokeStyle = 'green'
+                    c.strokeStyle = sortedColor;
                 }
                 else {
-                    c.strokeStyle = '#ddd'
+                    c.strokeStyle = unsortedColor;
                 }
                 c.stroke();
             }
@@ -287,13 +376,13 @@ window.addEventListener('load', () => {
                 c.lineTo(canvas.width/2 - totXLength/2 + (x * lineXGap),arrayListToSort[x]);
                 c.lineWidth = lineSize;
                 if(x === j){
-                    c.strokeStyle = 'red'
+                    c.strokeStyle = pointer;
                 }
                 else if(x === j+combSortGap){
-                    c.strokeStyle = 'blue'
+                    c.strokeStyle = marker;
                 }
                 else {
-                    c.strokeStyle = '#ddd'
+                    c.strokeStyle = unsortedColor;
                 }
                 c.stroke();
             }
@@ -342,16 +431,16 @@ window.addEventListener('load', () => {
                 c.lineTo(canvas.width/2 - totXLength/2 + (x * lineXGap),arrayListToSort[x]);
                 c.lineWidth = lineSize;
                 if(x === selectionSortMIN){
-                    c.strokeStyle = 'blue';
+                    c.strokeStyle = marker;
                 }
                 else if(x === j+ 1){
-                    c.strokeStyle = 'red'
+                    c.strokeStyle = pointer;
                 }
                 else if(x < i){
-                    c.strokeStyle = 'green'
+                    c.strokeStyle = sortedColor;
                 }
                 else {
-                    c.strokeStyle = '#ddd';
+                    c.strokeStyle = unsortedColor;
                 }
                // c.strokeStyle = 'red';
                 c.stroke();
@@ -380,16 +469,16 @@ window.addEventListener('load', () => {
                 c.lineTo(canvas.width/2 - totXLength/2 + (x * lineXGap),arrayListToSort[x]);
                 c.lineWidth = lineSize;
                 if(x === i){
-                    c.strokeStyle = 'red'
+                    c.strokeStyle = pointer;
                 }
                 else if(x === j){
-                    c.strokeStyle = "blue"
+                    c.strokeStyle = marker;
                 }
                 else if (x < i) {
-                    c.strokeStyle = "#90ee90"
+                    c.strokeStyle = sortedColor;
                 }
                 else {
-                    c.strokeStyle = "#ddd"
+                    c.strokeStyle = unsortedColor;
                 }
                 c.stroke();
             }
@@ -513,4 +602,61 @@ window.addEventListener('load', () => {
         return newArray
 
     }
+    function init(){
+        let width = window.innerWidth;
+        let menuHeight = document.getElementById('header').clientHeight;
+        if(width >= 768 && width <=899){
+            if(controlsVisible === true){
+                window.removeEventListener("click",externalControlClick)
+                controlsVisible = false; 
+                controlsBtn.style.color = "#300a44";
+                controlsContainer.style.left = "-100%";
+            }
+            controlsContainer.style.left = "auto";
+            canvas.width = 510;
+            canvas.height = document.documentElement.clientHeight - menuHeight;
+        }
+        else if(width >= 900 && width <=1099){
+            if(controlsVisible === true){
+                window.removeEventListener("click",externalControlClick)
+                controlsVisible = false; 
+                controlsBtn.style.color = "#300a44";
+                controlsContainer.style.left = "auto";
+                controlsContainer.style.position = "relative";
+            }
+            controlsContainer.style.left = "auto";
+            canvas.width = 650;
+            canvas.height = document.documentElement.clientHeight - menuHeight;
+        }
+        else if(width >=1100){
+            if(controlsVisible === true){
+                window.removeEventListener("click",externalControlClick)
+                controlsVisible = false; 
+                controlsBtn.style.color = "#300a44";
+                controlsContainer.style.position = "relative";
+            }
+            controlsContainer.style.left = "auto";
+            canvas.width = 850;
+            canvas.height = document.documentElement.clientHeight - menuHeight;
+        }
+        else{
+            if(controlsVisible === true){
+                window.removeEventListener("click",externalControlClick)
+                controlsVisible = false; 
+                controlsBtn.style.color = "#300a44";
+                controlsContainer.style.left = "-100%";
+            }
+            controlsContainer.style.left = "-100%";
+            canvas.height = document.documentElement.clientHeight - menuHeight;
+            canvas.width = document.documentElement.clientWidth;
+        }
+        setRange()
+        for(let a = 0; a < range.length; a++){
+            setInputValueFromRange(a)
+        }
+        initialSetup();
+        initialDraw();
+    }
+    /*------------INIT------------*/
+    init();
 })
